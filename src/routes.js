@@ -4,6 +4,9 @@ import { Router } from 'express';
 import SessionController from './app/controllers/SessionController';
 import StudentController from './app/controllers/StudentController';
 
+// Middlewares
+import authMiddleware from './app/middlewares/auth';
+
 // Validators
 import validateStudentStore from './app/validators/StudentStore';
 import validateStudentUpdate from './app/validators/StudentUpdate';
@@ -21,6 +24,11 @@ routes.get('/', (req, res) => {
  * Session
  */
 routes.post('/sessions', SessionController.store);
+
+/**
+ * Logged users
+ */
+routes.use(authMiddleware);
 
 /**
  * Student
