@@ -10,7 +10,7 @@ class StudentController {
   async get(req, res) {
     const student = await Student.findByPk(req.params.id);
 
-    return !student ? res.send(204) : res.json(student);
+    return student ? res.json(student) : res.send(204);
   }
 
   async store(req, res) {
@@ -21,6 +21,12 @@ class StudentController {
 
   async update(req, res) {
     const student = await Student.findByPk(req.params.id);
+
+    if (!student)
+      return res.status(400).json({
+        error: 'Ocorreu um erro:',
+        messages: [{ path: 'id', message: 'Aluno não encontrado!' }],
+      });
 
     await student.update(req.body);
 
