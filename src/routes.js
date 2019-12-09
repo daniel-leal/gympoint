@@ -4,6 +4,7 @@ import { Router } from 'express';
 import SessionController from './app/controllers/SessionController';
 import StudentController from './app/controllers/StudentController';
 import PlanController from './app/controllers/PlanController';
+import EnrollmentController from './app/controllers/EnrollmentController';
 
 // Middlewares
 import authMiddleware from './app/middlewares/auth';
@@ -36,11 +37,9 @@ routes.use(authMiddleware);
 /**
  * Student
  */
-routes.get('/students', StudentController.index);
 routes.get('/students/:id', StudentController.get);
 routes.post('/students', validateStudentStore, StudentController.store);
 routes.put('/students/:id', validateStudentUpdate, StudentController.update);
-routes.delete('/students/:id', StudentController.delete);
 
 /**
  * Plan
@@ -50,5 +49,12 @@ routes.get('/plans/:id', PlanController.get);
 routes.post('/plans', validatePlanStore, PlanController.store);
 routes.put('/plans/:id', validatePlanUpdate, PlanController.update);
 routes.delete('/plans/:id', PlanController.delete);
+
+/**
+ * Enrollments
+ */
+routes.get('/enrollments', EnrollmentController.index);
+routes.post('/enrollments/:student_id/student', EnrollmentController.store);
+routes.delete('/enrollments/:id', EnrollmentController.delete);
 
 export default routes;

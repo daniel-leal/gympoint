@@ -6,18 +6,28 @@ import databaseConfig from '../config/database';
 import User from '../app/models/User';
 import Student from '../app/models/Student';
 import Plan from '../app/models/Plan';
+import Enrollment from '../app/models/Enrollment';
 
-const models = [User, Student, Plan];
+const models = [User, Student, Plan, Enrollment];
 
 class Database {
   constructor() {
+    this.connection = new Sequelize(databaseConfig);
+
     this.init();
+    this.associate();
   }
 
   init() {
-    this.connection = new Sequelize(databaseConfig);
-
     models.map(model => model.init(this.connection));
+  }
+
+  associate() {
+    models.forEach(model => {
+      if (model.associate) {
+        model.associate(this.connection.models);
+      }
+    });
   }
 }
 
