@@ -10,10 +10,16 @@ import EnrollmentController from './app/controllers/EnrollmentController';
 import authMiddleware from './app/middlewares/auth';
 
 // Validators
-import validateStudentStore from './app/validators/StudentStore';
-import validateStudentUpdate from './app/validators/StudentUpdate';
-import validatePlanStore from './app/validators/PlanStore';
-import validatePlanUpdate from './app/validators/PlanUpdate';
+import validateSessionStore from './app/validators/Session/Store';
+
+import validateStudentStore from './app/validators/Student/Store';
+import validateStudentUpdate from './app/validators/Student/Update';
+
+import validatePlanStore from './app/validators/Plan/Store';
+import validatePlanUpdate from './app/validators/Plan/Update';
+
+import validateEnrollmentStore from './app/validators/Enrollment/Store';
+import validateEnrollmentUpdate from './app/validators/Enrollment/Update';
 
 const routes = new Router();
 
@@ -27,7 +33,7 @@ routes.get('/', (req, res) => {
 /**
  * Session
  */
-routes.post('/sessions', SessionController.store);
+routes.post('/sessions', validateSessionStore, SessionController.store);
 
 /**
  * Logged users
@@ -51,10 +57,19 @@ routes.put('/plans/:id', validatePlanUpdate, PlanController.update);
 routes.delete('/plans/:id', PlanController.delete);
 
 /**
- * Enrollments
+ * Enrollment
  */
 routes.get('/enrollments', EnrollmentController.index);
-routes.post('/enrollments/:student_id/student', EnrollmentController.store);
+routes.post(
+  '/enrollments/:student_id/student',
+  validateEnrollmentStore,
+  EnrollmentController.store
+);
+routes.put(
+  '/enrollments/:id/student',
+  validateEnrollmentUpdate,
+  EnrollmentController.update
+);
 routes.delete('/enrollments/:id', EnrollmentController.delete);
 
 export default routes;

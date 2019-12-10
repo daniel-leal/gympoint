@@ -68,7 +68,43 @@ class EnrollmentController {
     return res.json(enrollment);
   }
 
-  // TODO - UPDATE ENROLLMENT
+  async update(req, res) {
+    const { id } = req.params;
+    const { plan_id, student_id, start_date } = req.body;
+
+    const enrollment = await Enrollment.findByPk(id);
+    if (!enrollment)
+      return res.status(400).json({
+        error: 'Ocorreu um erro:',
+        messages: [{ path: 'id', message: 'Matrícula não encontrada' }],
+      });
+
+    const plan = await Plan.findByPk(plan_id);
+    if (!plan)
+      return res.status(400).json({
+        error: 'Ocorreu um erro:',
+        messages: [{ path: 'plan_id', message: 'Plano não encontrado' }],
+      });
+
+    const student = await Student.findByPk(student_id);
+    if (!student)
+      return res.status(400).json({
+        error: 'Ocorreu um erro:',
+        messages: [{ path: 'student_id', message: 'Aluno não encontrado' }],
+      });
+
+    const end_date = addMonths(parseISO(start_date), plan.duration);
+
+    await enrollment.update({
+      plan_id,
+      student_id,
+      start_date,
+      end_date,
+      price: plan.duration * plan.price,
+    });
+
+    return res.json(enrollment);
+  }
 
   async delete(req, res) {
     const enrollment = await Enrollment.findByPk(req.params.id);
