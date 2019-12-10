@@ -8,10 +8,6 @@ export default async (req, res, next) => {
       start_date: Yup.date('Data de início inválida').required(
         'Data de início é um campo obrigatório'
       ),
-      end_date: Yup.date('Data de término inválida').required(
-        'Data de término é um campo obrigatório'
-      ),
-      price: Yup.number().positive('Preço deve ser um valor positivo'),
     });
 
     await schema.validate(req.body, { abortEarly: false });
