@@ -6,6 +6,8 @@ import StudentController from './app/controllers/StudentController';
 import PlanController from './app/controllers/PlanController';
 import EnrollmentController from './app/controllers/EnrollmentController';
 import CheckinController from './app/controllers/CheckinController';
+import HelpOrderController from './app/controllers/HelpOrderController';
+import AnswerController from './app/controllers/AnswerController';
 
 // Middlewares
 import authMiddleware from './app/middlewares/auth';
@@ -21,6 +23,10 @@ import validatePlanUpdate from './app/validators/Plan/Update';
 
 import validateEnrollmentStore from './app/validators/Enrollment/Store';
 import validateEnrollmentUpdate from './app/validators/Enrollment/Update';
+
+import validateHelpOrderStore from './app/validators/HelpOrder/Store';
+
+import validateAnswerStore from './app/validators/Answer/Store';
 
 const routes = new Router();
 
@@ -41,6 +47,17 @@ routes.post('/sessions', validateSessionStore, SessionController.store);
  */
 routes.get('/students/:student_id/checkins', CheckinController.index);
 routes.post('/students/:student_id/checkins', CheckinController.store);
+
+/**
+ * Help Order
+ */
+routes.get('/help-orders', HelpOrderController.index);
+routes.get('/students/:student_id/help-orders', HelpOrderController.get);
+routes.post(
+  '/students/:student_id/help-orders',
+  validateHelpOrderStore,
+  HelpOrderController.store
+);
 
 /**
  * Logged users
@@ -78,5 +95,14 @@ routes.put(
   EnrollmentController.update
 );
 routes.delete('/enrollments/:id', EnrollmentController.delete);
+
+/**
+ * Answer
+ */
+routes.post(
+  '/help-orders/:help_order_id/answer',
+  validateAnswerStore,
+  AnswerController.store
+);
 
 export default routes;
