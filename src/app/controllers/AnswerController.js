@@ -1,12 +1,14 @@
 import HelpOrder from '../models/HelpOrder';
 import Student from '../models/Student';
 
+import Mail from '../../lib/Mail';
+
 class AnswerController {
   async store(req, res) {
     const { help_order_id } = req.params;
     const { answer } = req.body;
 
-    const helpOrder = await HelpOrder.findByPk(help_order_id, {
+    const help_order = await HelpOrder.findByPk(help_order_id, {
       include: [
         {
           model: Student,
@@ -16,7 +18,7 @@ class AnswerController {
       ],
     });
 
-    if (!helpOrder)
+    if (!help_order)
       return res.status(400).json({
         error: 'Ocorreu um erro:',
         messages: [
@@ -24,7 +26,7 @@ class AnswerController {
         ],
       });
 
-    if (helpOrder.answer !== null)
+    if (help_order.answer !== null)
       return res.status(400).json({
         error: 'Ocorreu um erro:',
         messages: [
@@ -32,16 +34,23 @@ class AnswerController {
         ],
       });
 
-    await helpOrder.update({
+    await help_order.update({
       answer,
       answer_at: new Date(),
     });
 
-    /**
-     * TODO: SEND MAIL
-     */
+    await Mail.sendMail({
+      to: `${help_order.student.name} <${help_order.student.email}>`,
+      subject: 'Pedido de ajuda - [Resposta]',
+      template: 'AnswerMail',
+      context: {
+        name: help_order.student.name,
+        question: help_order.question,
+        answer: help_order.answer,
+      },
+    });
 
-    return res.json(helpOrder);
+    return res.json(help_order);
   }
 }
 

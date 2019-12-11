@@ -1,6 +1,8 @@
 import HelpOrder from '../models/HelpOrder';
 import Student from '../models/Student';
 
+import Mail from '../../lib/Mail';
+
 class HelpOrderController {
   async index(req, res) {
     const help_orders = await HelpOrder.findAll({
@@ -55,9 +57,14 @@ class HelpOrderController {
       question,
     });
 
-    /**
-     * TODO: SEND MAIL
-     */
+    await Mail.sendMail({
+      to: `${student.name} <${student.email}>`,
+      subject: 'Pedido de ajuda',
+      template: 'HelpOrderMail',
+      context: {
+        name: student.name,
+      },
+    });
 
     return res.json(help_order);
   }
