@@ -1,8 +1,8 @@
 import Mail from '../../lib/Mail';
 
-class HelpOrderMail {
+class AnswerMail {
   get key() {
-    return 'HelpOrderMail';
+    return 'AnswerMail';
   }
 
   async handle({ data }) {
@@ -21,4 +21,4 @@ class HelpOrderMail {
   }
 }
 
-export default new HelpOrderMail();
+export default new AnswerMail();

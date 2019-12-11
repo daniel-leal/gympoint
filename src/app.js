@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import './bootstrap';
 
 import express from 'express';
 import Youch from 'youch';
@@ -39,4 +39,4 @@ class App {
   }
 }
 
-export default new App();
+export default new App().server;
