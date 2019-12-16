@@ -1,6 +1,25 @@
+import { Op } from 'sequelize';
+
 import Student from '../models/Student';
 
 class StudentController {
+  async index(req, res) {
+    const where = {};
+    const page = req.query.page || 1;
+
+    if (req.query.name) {
+      where.name = {
+        [Op.like]: `%${req.query.name}%`
+      }
+    }
+
+    const students = await Student.findAll({
+      where
+    });
+
+    return res.json(students);
+  }
+
   async get(req, res) {
     const student = await Student.findByPk(req.params.id);
 

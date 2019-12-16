@@ -67,6 +67,7 @@ routes.use(authMiddleware);
 /**
  * Student
  */
+routes.get('/students', StudentController.index);
 routes.get('/students/:id', StudentController.get);
 routes.post('/students', validateStudentStore, StudentController.store);
 routes.put('/students/:id', validateStudentUpdate, StudentController.update);

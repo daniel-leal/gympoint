@@ -1,11 +1,11 @@
 import request from 'supertest';
 import faker from 'faker';
 
-import app from '../../src/app';
-import factory from '../factories';
-import truncate from '../util/truncate';
+import app from '../../../src/app';
+import factory from '../../factories';
+import truncate from '../../util/truncate';
 
-describe('Session', () => {
+describe('Session store', () => {
   beforeEach(async () => {
     await truncate();
   });

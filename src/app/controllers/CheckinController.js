@@ -25,7 +25,7 @@ class CheckinController {
   async store(req, res) {
     const { student_id } = req.params;
 
-    const student = Student.findByPk(student_id);
+    const student = await Student.findByPk(student_id);
 
     if (!student)
       return res.status(400).json({
