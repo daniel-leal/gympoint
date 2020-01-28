@@ -19,7 +19,14 @@ class SessionController {
       return res.status(401).json(errorMsg);
     }
 
+    const { id, name } = user;
+
     return res.json({
+      user: {
+        id,
+        name,
+        email,
+      },
       token: user.generateToken(),
     });
   }

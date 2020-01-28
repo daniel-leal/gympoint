@@ -33,8 +33,13 @@ const routes = new Router();
 /**
  * API Check
  */
-routes.get('/', (req, res) => {
-  res.json({ status: 'ok', version: '1.0', app: 'GymPoint' });
+routes.get('/', async (req, res) => {
+  res.json({
+    status: 'ok',
+    version: '1.0.0',
+    app: 'GymPoint',
+    mode: process.env.NODE_ENV,
+  });
 });
 
 /**

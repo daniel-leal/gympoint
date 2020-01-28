@@ -4,26 +4,42 @@ import Student from '../models/Student';
 
 class StudentController {
   async index(req, res) {
-    const where = {};
-    const page = req.query.page || 1;
+    const name = req.query.name || '';
+    const page = parseInt(req.query.page || 1, 10);
+    const perPage = parseInt(req.query.perPage || 5, 10);
 
-    if (req.query.name) {
-      where.name = {
-        [Op.like]: `%${req.query.name}%`
-      }
-    }
-
-    const students = await Student.findAll({
-      where
+    const students = await Student.findAndCountAll({
+      order: ['name'],
+      where: {
+        name: {
+          [Op.iLike]: `%${name}%`,
+        },
+      },
+      limit: perPage,
+      offset: (page - 1) * perPage,
     });
 
-    return res.json(students);
+    const totalPage = Math.ceil(students.count / perPage);
+
+    return res.json({
+      page,
+      perPage,
+      data: students.rows,
+      total: students.count,
+      totalPage,
+    });
   }
 
   async get(req, res) {
     const student = await Student.findByPk(req.params.id);
 
-    return student ? res.json(student) : res.send(204);
+    if (!student)
+      return res.status(404).json({
+        error: 'Ocorreu um erro:',
+        messages: [{ path: 'id', message: 'Aluno não encontrado' }],
+      });
+
+    return res.json(student);
   }
 
   async store(req, res) {
@@ -40,7 +56,7 @@ class StudentController {
 
     const student = await Student.create(req.body);
 
-    return res.json(student);
+    return res.status(201).json(student);
   }
 
   async update(req, res) {
@@ -73,6 +89,20 @@ class StudentController {
     await student.update(req.body);
 
     return res.json(student);
+  }
+
+  async destroy(req, res) {
+    const { id } = req.params;
+    const student = await Student.findByPk(id);
+
+    if (!student)
+      return res.status(400).json({
+        error: 'Ocorreu um erro:',
+        messages: [{ path: 'id', message: 'Aluno não encontrado!' }],
+      });
+
+    await student.destroy();
+    return res.status(204).send();
   }
 }
 
