@@ -90,7 +90,7 @@ class PlanController {
 
     await plan.destroy();
 
-    return res.send(204);
+    return res.sendStatus(204);
   }
 }
 

@@ -60,10 +60,12 @@ class StudentController {
   }
 
   async update(req, res) {
-    const { email } = req.body;
+    const { email, id } = req.body;
 
     if (email) {
-      const checkStudent = await Student.findOne({ where: { email } });
+      const checkStudent = await Student.findOne({
+        where: { email, [Op.not]: [{ id }] },
+      });
 
       if (checkStudent) {
         return res.status(401).json({
