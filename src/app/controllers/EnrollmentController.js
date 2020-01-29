@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import { addMonths, parseISO } from 'date-fns';
 
 import Enrollment from '../models/Enrollment';
@@ -6,13 +7,66 @@ import Plan from '../models/Plan';
 
 class EnrollmentController {
   async index(req, res) {
-    const enrollments = await Enrollment.findAll({
-      attributes: ['id', 'start_date', 'end_date', 'price', 'active'],
+    const term = req.query.term || '';
+    const page = parseInt(req.query.page || 1, 10);
+    const perPage = parseInt(req.query.perPage || 5, 10);
+    const enrollments = await Enrollment.findAndCountAll({
+      order: ['id'],
+      where: {
+        [Op.or]: [
+          {
+            '$student.name$': {
+              [Op.iLike]: `%${term}%`,
+            },
+          },
+          {
+            '$plan.title$': {
+              [Op.iLike]: `%${term}%`,
+            },
+          },
+        ],
+      },
       include: [
         {
           model: Student,
           as: 'student',
-          attributes: ['id', 'name', 'email'],
+          attributes: ['id', 'name'],
+        },
+        {
+          model: Plan,
+          as: 'plan',
+          attributes: ['id', 'title', 'duration', 'price'],
+        },
+      ],
+      limit: perPage,
+      offset: (page - 1) * perPage,
+    });
+
+    // return res.json(enrollments);
+
+    const totalPage = Math.ceil(enrollments.count / perPage);
+
+    return res.json({
+      page,
+      perPage,
+      data: enrollments.rows,
+      total: enrollments.count,
+      totalPage,
+    });
+  }
+
+  async get(req, res) {
+    const { id } = req.params;
+
+    const enrollment = await Enrollment.findOne({
+      where: {
+        id,
+      },
+      include: [
+        {
+          model: Student,
+          as: 'student',
+          attributes: ['id', 'name'],
         },
         {
           model: Plan,
@@ -22,7 +76,13 @@ class EnrollmentController {
       ],
     });
 
-    return res.json(enrollments);
+    if (!enrollment)
+      return res.status(400).json({
+        error: 'Ocorreu um erro:',
+        messages: [{ path: 'id', message: 'Matrícula não encontrada' }],
+      });
+
+    return res.json(enrollment);
   }
 
   async store(req, res) {
@@ -51,7 +111,7 @@ class EnrollmentController {
       },
     });
 
-    if (studentCheckEnrollment)
+    if (studentCheckEnrollment && studentCheckEnrollment.active)
       return res.status(400).json({
         error: 'Ocorreu um erro:',
         messages: [{ path: 'id', message: 'Este aluno já está em um plano' }],

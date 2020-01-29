@@ -91,6 +91,7 @@ routes.delete('/plans/:id', PlanController.delete);
  * Enrollment
  */
 routes.get('/enrollments', EnrollmentController.index);
+routes.get('/enrollments/:id', EnrollmentController.get);
 routes.post(
   '/enrollments/:student_id/student',
   validateEnrollmentStore,
