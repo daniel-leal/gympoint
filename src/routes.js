@@ -56,8 +56,7 @@ routes.post('/students/:student_id/checkins', CheckinController.store);
 /**
  * Help Order
  */
-routes.get('/help-orders', HelpOrderController.index);
-routes.get('/students/:student_id/help-orders', HelpOrderController.get);
+routes.get('/students/:id/help-orders', HelpOrderController.index);
 routes.post(
   '/students/:student_id/help-orders',
   validateHelpOrderStore,
@@ -107,6 +106,7 @@ routes.delete('/enrollments/:id', EnrollmentController.delete);
 /**
  * Answer
  */
+routes.get('/help-orders', AnswerController.index);
 routes.post(
   '/help-orders/:help_order_id/answer',
   validateAnswerStore,
