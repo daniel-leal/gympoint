@@ -73,6 +73,11 @@ class AnswerController {
       help_order,
     });
 
+    const ownerSocket = req.conectedStudents[help_order.student_id];
+    if (ownerSocket) {
+      req.io.to(ownerSocket).emit('ANSWER_NOTIFICATION', help_order);
+    }
+
     return res.json(help_order);
   }
 }

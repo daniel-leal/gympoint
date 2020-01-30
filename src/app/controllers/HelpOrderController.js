@@ -48,10 +48,22 @@ class HelpOrderController {
         messages: [{ path: 'student_id', message: 'Aluno não encontrado' }],
       });
 
-    const help_order = await HelpOrder.create({
+    const help_order_created = await HelpOrder.create({
       student_id,
       question,
     });
+
+    const help_order = await help_order_created.reload({
+      include: [
+        {
+          model: Student,
+          as: 'student',
+          attributes: ['id', 'name'],
+        },
+      ],
+    });
+
+    req.io.emit('HELP_ORDER_CREATE_NOTIFICATION', help_order);
 
     return res.json(help_order);
   }

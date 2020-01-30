@@ -3,6 +3,8 @@ import './bootstrap';
 import express from 'express';
 import cors from 'cors';
 import Youch from 'youch';
+import io from 'socket.io';
+import http from 'http';
 
 import 'express-async-errors';
 
@@ -11,29 +13,51 @@ import './database';
 
 class App {
   constructor() {
-    this.server = express();
-
+    this.app = express();
+    this.server = http.Server(this.app);
+    this.socket();
     this.middlewares();
     this.routes();
     this.exceptionHandler();
+
+    this.conectedStudents = {};
+  }
+
+  socket() {
+    this.io = io(this.server);
+
+    this.io.on('connection', socket => {
+      const { student_id } = socket.handshake.query;
+      this.conectedStudents[student_id] = socket.id;
+
+      socket.on('disconect', () => {
+        delete this.conectedStudents[student_id];
+      });
+    });
   }
 
   middlewares() {
-    this.server.use(express.json());
-    this.server.use(express.urlencoded({ extended: false }));
-    this.server.use(
+    this.app.use(express.json());
+    this.app.use(express.urlencoded({ extended: false }));
+    this.app.use(
       cors({
         origin: process.env.FRONT_URL,
       })
     );
+
+    this.app.use((req, res, next) => {
+      req.io = this.io;
+      req.conectedStudents = this.conectedStudents;
+      next();
+    });
   }
 
   routes() {
-    this.server.use(routes);
+    this.app.use(routes);
   }
 
   exceptionHandler() {
-    this.server.use(async (err, req, res, next) => {
+    this.app.use(async (err, req, res, next) => {
       if (process.env.NODE_ENV === 'development') {
         const errors = await new Youch(err, req).toJSON();
 
