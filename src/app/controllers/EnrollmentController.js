@@ -1,5 +1,7 @@
 import { Op } from 'sequelize';
 import { addMonths, parseISO } from 'date-fns';
+import Queue from '../../lib/Queue';
+import EnrollmentMail from '../jobs/EnrollmentMail';
 
 import Enrollment from '../models/Enrollment';
 import Student from '../models/Student';
@@ -127,6 +129,8 @@ class EnrollmentController {
       price: plan.duration * plan.price,
     });
 
+    await Queue.add(EnrollmentMail.key, { enrollment, student, plan });
+
     return res.json(enrollment);
   }
 
@@ -180,7 +184,7 @@ class EnrollmentController {
 
     await enrollment.destroy();
 
-    return res.send(204);
+    return res.sendStatus(204);
   }
 }
 

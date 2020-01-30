@@ -1,12 +1,9 @@
 import Bee from 'bee-queue';
-// import * as Sentry from '@sentry/node';
-// import sentryConfig from '../config/sentry';
-
-import AnswerMail from '../app/jobs/AnswerMail';
 import redisConfig from '../config/redis';
+import EnrollmentMail from '../app/jobs/EnrollmentMail';
+import AnswerMail from '../app/jobs/AnswerMail';
 
-const jobs = [AnswerMail];
-
+const jobs = [EnrollmentMail, AnswerMail];
 class Queue {
   constructor() {
     this.queues = {};
@@ -18,9 +15,7 @@ class Queue {
     jobs.forEach(({ key, handle }) => {
       this.queues[key] = {
         bee: new Bee(key, {
-          redis: {
-            redisConfig,
-          },
+          redis: redisConfig,
         }),
         handle,
       };
@@ -34,17 +29,12 @@ class Queue {
   processQueue() {
     jobs.forEach(job => {
       const { bee, handle } = this.queues[job.key];
-
       bee.on('failed', this.handleFailure).process(handle);
     });
   }
 
   handleFailure(job, err) {
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`Queue ${job.queue.name}: FAILED`, err);
-    }
-
-    // Sentry.captureException(err);
+    console.error(`Queue ${job.queue.name}: FAILED`, err);
   }
 }
 
