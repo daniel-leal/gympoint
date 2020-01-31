@@ -6,6 +6,7 @@ import Youch from 'youch';
 import io from 'socket.io';
 import http from 'http';
 
+import path from 'path';
 import 'express-async-errors';
 
 import routes from './routes';
@@ -39,10 +40,11 @@ class App {
   middlewares() {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: false }));
+    this.app.use(cors());
+
     this.app.use(
-      cors({
-        origin: process.env.FRONT_URL,
-      })
+      '/files',
+      express.static(path.resolve(__dirname, '..', 'tmp', 'uploads'))
     );
 
     this.app.use((req, res, next) => {

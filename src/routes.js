@@ -1,4 +1,8 @@
 import { Router } from 'express';
+import multer from 'multer';
+
+// Configs
+import multerConfig from './config/multer';
 
 // Controllers
 import SessionController from './app/controllers/SessionController';
@@ -7,13 +11,17 @@ import PlanController from './app/controllers/PlanController';
 import EnrollmentController from './app/controllers/EnrollmentController';
 import CheckinController from './app/controllers/CheckinController';
 import HelpOrderController from './app/controllers/HelpOrderController';
+import NotificationController from './app/controllers/NotificationController';
 import AnswerController from './app/controllers/AnswerController';
+import SessionStudentController from './app/controllers/SessionStudentController';
+import FileController from './app/controllers/FileController';
 
 // Middlewares
 import authMiddleware from './app/middlewares/auth';
 
 // Validators
 import validateSessionStore from './app/validators/Session/Store';
+import validateStudentSessionStore from './app/validators/SessionStudent/Store';
 
 import validateStudentStore from './app/validators/Student/Store';
 import validateStudentUpdate from './app/validators/Student/Update';
@@ -29,6 +37,7 @@ import validateHelpOrderStore from './app/validators/HelpOrder/Store';
 import validateAnswerStore from './app/validators/Answer/Store';
 
 const routes = new Router();
+const upload = multer(multerConfig);
 
 /**
  * API Check
@@ -46,6 +55,11 @@ routes.get('/', async (req, res) => {
  * Session
  */
 routes.post('/sessions', validateSessionStore, SessionController.store);
+routes.post(
+  '/sessionsStudent',
+  validateStudentSessionStore,
+  SessionStudentController.store
+);
 
 /**
  * Checkin
@@ -76,6 +90,7 @@ routes.get('/students/:id', StudentController.get);
 routes.post('/students', validateStudentStore, StudentController.store);
 routes.put('/students/:id', validateStudentUpdate, StudentController.update);
 routes.delete('/students/:id', StudentController.destroy);
+routes.post('/students/:id/files', upload.single('file'), FileController.store);
 
 /**
  * Plan
@@ -112,5 +127,10 @@ routes.post(
   validateAnswerStore,
   AnswerController.store
 );
+
+/**
+ * Notifications
+ */
+routes.get('/notifications', NotificationController.index);
 
 export default routes;
