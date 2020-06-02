@@ -15,6 +15,7 @@ import NotificationController from './app/controllers/NotificationController';
 import AnswerController from './app/controllers/AnswerController';
 import SessionStudentController from './app/controllers/SessionStudentController';
 import FileController from './app/controllers/FileController';
+import HomeController from './app/controllers/HomeController';
 
 // Middlewares
 import authMiddleware from './app/middlewares/auth';
@@ -50,6 +51,11 @@ routes.get('/', async (req, res) => {
     mode: process.env.NODE_ENV,
   });
 });
+
+/**
+ * Home Controller
+ */
+routes.get('/home', HomeController.index);
 
 /**
  * Session
